@@ -7,6 +7,8 @@ which fixes rare bugs I've encountered in that gist.
 
 This is configured to highlight ruby, C, C++, Clojure, CSS, ERB, Go, Java, JavaScript, JSON, PHP, Lua, Python, SASS, SCSS, SQL, XML, and YAML files.
 
+![Demo](images/git_diff.png)
+
 Scripts
 -------
 
