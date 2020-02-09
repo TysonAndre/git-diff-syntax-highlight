@@ -59,3 +59,12 @@ After adding those to a directory the shell's `$PATH`, you probably also want to
 	simple-diff = !git-simple-diff
 	simple-show = !git-simple-show
 ```
+
+Similar Projects
+----------------
+
+https://github.com/dandavison/delta is a similar project written in Rust, with more themes and configuration options, and
+
+https://github.com/sharkdp/bat is similar to the `colorless` script this provides, with more themes.
+
+https://github.com/trishume/syntect is the library those Rust projects use.
