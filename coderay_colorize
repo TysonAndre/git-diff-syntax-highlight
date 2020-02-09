@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+# Source: https://gist.github.com/skanev/0eeb943e3111a1df55fd
+# This hardcodes the path to ruby to avoid interference from rvm
+#
+# Usage: add the following to .gitconfig
+#
+#     [core]
+#         pager = /path/to/git-diff-syntax-highlight.rb --highlight | less -F -X
+#         # The -F -X is optional
+#
+# Installing Dependencies:
+#
+#    gem install --user term-ansicolor coderay
+require 'coderay'
+require 'term/ansicolor'
+require 'optparse'
+require_relative 'vim'
+
+
+# --- Parsing git diffs ------------------------------------------------------
+
+FORMATS = {
+  'Gemfile' => :ruby,
+  'rb' => :ruby,
+  'c' => :c,
+  'h' => :c,
+  'cpp' => :cpp,
+  'cxx' => :cpp,
+  'hpp' => :cpp,
+  'clj' => :clojure,
+  'css' => :css,
+  'erb' => :erb,
+  'go' => :go,
+  'java' => :java,
+  'js' => :javascript,
+  'json' => :json,
+  'php' => :php,
+  'html' => :php,
+  'lua' => :lua,
+  'py' => :python,
+  'sass' => :sass,
+  'scss' => :scss,
+  'sql' => :sql,
+  'xml' => :xml,
+  'yml' => :yaml,
+  'yaml' => :yaml,
+}
+
+CACHED_OBJECTS = {}
+
+if ARGV.length != 1
+    puts "Wrong argument count: #{ARGV}"
+    exit 1
+end
+path = ARGV[0]
+code = File.read(path)
+format = FORMATS[path[/(\w+)$/, 1]]
+code = CodeRay.scan(code, format).terminal if format
+puts code

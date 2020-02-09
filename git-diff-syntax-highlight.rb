@@ -1,14 +1,20 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # Source: https://gist.github.com/skanev/0eeb943e3111a1df55fd
 # This hardcodes the path to ruby to avoid interference from rvm
 #
 # Usage: add the following to .gitconfig
 #
 #     [core]
-#         pager = /path/to/git-diff-syntax-highlight.rb | less
+#         pager = /path/to/git-diff-syntax-highlight.rb --highlight | less -F -X
+#         # The -F -X is optional
 #
-# Dependencies:
-# gem install --user term-ansicolor coderay
+# Installing Dependencies:
+#
+#    gem install --user term-ansicolor coderay
+#
+# If you are using RVM, you may wish to hardcode the first line of this script to the path of the
+# ruby interpreter that was used to install those dependencies.
+# (found in a path such as /home/username/.rvm/rubies/ruby-x.y.z/bin/ruby)
 require 'coderay'
 require 'term/ansicolor'
 require 'optparse'
@@ -28,7 +34,12 @@ GRADIENTS   = {}
 
 def adjust(text, target, gradient = 8)
   open     = adjust_seq("\e[37m", target, gradient)
-  adjusted = text.chomp.gsub(/\e\[[0-9;]+m/) { |seq| adjust_seq(seq, target, gradient) }
+  begin
+    adjusted = text.chomp.gsub(/\e\[[0-9;]+m/) { |seq| adjust_seq(seq, target, gradient) }
+  rescue ArgumentError
+    # invalid byte sequence in UTF-8
+    adjusted = text.chomp
+  end
 
   "#{open}#{adjusted}"
 end
@@ -113,7 +124,8 @@ def show(sha, path)
 
   format = FORMATS[path[/(\w+)$/, 1]]
   code = `git show #{sha} 2> /dev/null`
-  code = File.read(path) if code.empty?
+  # This can be a directory?
+  code = File.read(path) if (code.empty? and File.file? path)
   code = CodeRay.scan(code, format).terminal if format
   CACHED_OBJECTS[sha] = code.lines
 end
@@ -128,7 +140,13 @@ def process(options)
   new_hash  = nil
 
   while gets
-    stripped = $_.gsub(/(\e\[[0-9;]*m)*/, '')
+    begin
+      stripped = $_.gsub(/(\e\[[0-9;]*m)*/, '')
+    rescue ArgumentError
+      # "invalid byte sequence in UTF-8"
+      puts $_
+      next
+    end
     case stripped
     when /^index (\w+)..(\w+)/
       old_hash = $1
@@ -154,7 +172,7 @@ def process(options)
         puts $_
         next
       elsif options[:highlight]
-        puts adjust(" #{new[new_start]}", GRAY, 10)
+        puts adjust(" #{new[new_start]}", GRAY, 1)
       else
         puts $_
       end
@@ -163,13 +181,23 @@ def process(options)
       old_start += 1
       new_start += 1
     when /^\+/
-      puts adjust("+#{new[new_start]}", GREEN)
-      new_start += 1
-      remaining -= 1
+      if new_start.nil?
+          puts $_
+      else
+          puts adjust("+#{new[new_start]}", GREEN)
+          new_start += 1
+      end
+      unless remaining.nil?
+          remaining -= 1
+      end
     when /^-/
-      puts adjust("-#{old[old_start]}", RED)
-      old_start += 1
-      remaining -= 1
+      unless old_start.nil?
+          puts adjust("-#{old[old_start]}", RED)
+          old_start += 1
+      end
+      unless remaining.nil?
+          remaining -= 1
+      end
     else
       puts $_
     end
@@ -183,9 +211,17 @@ OptionParser.new do |opts|
   opts.on("-h", "--[no-]highlight", "Highlight all the code") do |v|
     options[:highlight] = v
   end
+  opts.on("-s", "--[no-]coderay-colors", "Use coderay's standard terminal color scheme instead of a vim-like color scheme") do |v|
+    options[:coderay_colors] = v
+  end
 end.parse!
 
 begin
+  if !options[:coderay_colors]
+    # Custom overrides for colors
+    require_relative 'vim'
+  end
+
   process(options)
 rescue Errno::EPIPE
   exit 0

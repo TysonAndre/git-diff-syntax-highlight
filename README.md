@@ -7,6 +7,13 @@ which fixes rare bugs I've encountered in that gist.
 
 This is configured to highlight ruby, C, C++, Clojure, CSS, ERB, Go, Java, JavaScript, JSON, PHP, Lua, Python, SASS, SCSS, SQL, XML, and YAML files.
 
+Scripts
+-------
+
+- `git-diff-syntax-highlight.rb` - A syntax highlighter for git diffs.
+- `colorless` - Like `less filename.extension`, but with syntax highlighting.
+- `coderay_colorize` - Like `cat filename.extension`, but with syntax highlighting.
+
 Known Issues
 ------------
 
@@ -35,7 +42,9 @@ and because changes in rvm paths can break diffs completely.
 
 ```
 [core]
-    pager = /path/to/git-diff-syntax-highlight.rb | less
+    pager = /path/to/git-diff-syntax-highlight.rb --highlight | less -F -X
+    # The -F -X is optional.
+    # In addition to --highlight, --coderay-colors may be used to change the syntax highlighting.
 ```
 
 
