@@ -1,0 +1,4 @@
+#!/bin/sh
+# Installation:
+# git config --global alias.simple-diff '!git-simple-diff'
+git --no-pager diff -p --color "$@" | less -R -F -X

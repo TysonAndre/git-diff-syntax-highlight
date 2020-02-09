@@ -1,0 +1,4 @@
+#!/bin/sh
+# Installation:
+# git config --global alias.simple-show '!git-simple-show'
+git --no-pager show -p --color "$@" | less -R -F -X
