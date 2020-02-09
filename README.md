@@ -4,6 +4,7 @@ git-diff-syntax-highlight
 Utilities to include syntax highlighting in the terminal, for git diffs and other commands.
 This is a patched version of https://gist.github.com/skanev/0eeb943e3111a1df55fd
 which fixes rare bugs I've encountered in that gist.
+It also patches the syntax highlighting to match my personal preferences.
 
 This is configured to highlight ruby, C, C++, Clojure, CSS, ERB, Go, Java, JavaScript, JSON, PHP, Lua, Python, SASS, SCSS, SQL, XML, and YAML files.
 
@@ -63,8 +64,8 @@ After adding those to a directory the shell's `$PATH`, you probably also want to
 Similar Projects
 ----------------
 
-https://github.com/dandavison/delta is a similar project written in Rust, with more themes and configuration options, and
+https://github.com/dandavison/delta is a similar project written in Rust, with more themes and configuration options.
 
 https://github.com/sharkdp/bat is similar to the `colorless` script this provides, with more themes.
 
-https://github.com/trishume/syntect is the library those Rust projects use.
+https://github.com/trishume/syntect is the library those Rust projects use. I'd expect it to have faster startup times and better performance on long diffs.
